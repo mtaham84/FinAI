@@ -89,16 +89,26 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class EmailVerificationToken(models.Model):
-    """Architecture for future email verification. Tokens are single-use and hashed."""
+    """Single-use email OTP. Raw codes are never stored."""
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="email_tokens")
     token_hash = models.CharField(max_length=128, unique=True)
+    code_hash = models.CharField(max_length=256)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     used_at = models.DateTimeField(null=True, blank=True)
+    attempt_count = models.PositiveSmallIntegerField(default=0)
+    resend_count = models.PositiveSmallIntegerField(default=0)
+    window_started_at = models.DateTimeField(null=True, blank=True)
+    locked_until = models.DateTimeField(null=True, blank=True)
 
     def is_valid(self):
-        return self.used_at is None and timezone.now() < self.expires_at
+        now = timezone.now()
+        return (
+            self.used_at is None
+            and now < self.expires_at
+            and (self.locked_until is None or self.locked_until <= now)
+        )
 
 
 class PhoneOTP(models.Model):

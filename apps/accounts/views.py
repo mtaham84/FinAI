@@ -4,6 +4,8 @@ import secrets
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
+from django.contrib.auth.hashers import check_password, make_password
 from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.cache import never_cache
@@ -15,8 +17,9 @@ from .forms import (
     PasswordResetConfirmForm,
     PasswordResetRequestForm,
     RegistrationForm,
+    EmailVerificationForm,
 )
-from .models import LoginAttempt, PasswordResetToken, User
+from .models import EmailVerificationToken, LoginAttempt, PasswordResetToken, User
 
 GENERIC_LOGIN_ERROR = "اطلاعات ورود نادرست است. دوباره تلاش کنید."
 GENERIC_RESET_MESSAGE = (
@@ -29,6 +32,49 @@ def _client_ip(request):
     if xff:
         return xff.split(",")[0].strip()
     return request.META.get("REMOTE_ADDR")
+
+
+def _issue_email_code(user, token=None):
+    """Issue and deliver a six-digit OTP; only its hash is persisted."""
+    now = timezone.now()
+    if token is None:
+        token = EmailVerificationToken.objects.create(
+            user=user,
+            token_hash=hashlib.sha256(secrets.token_bytes(32)).hexdigest(),
+            code_hash="pending",
+            expires_at=now,
+            resend_count=0,
+            window_started_at=now,
+        )
+    elif token.window_started_at is None or now - token.window_started_at >= timezone.timedelta(minutes=3):
+        token.resend_count = 0
+        token.window_started_at = now
+
+    if token.resend_count >= 5:
+        token.locked_until = now + timezone.timedelta(minutes=3)
+        token.save(update_fields=["locked_until", "window_started_at", "resend_count"])
+        return False, "به سقف درخواست کد رسیده‌اید. ۳ دقیقه بعد دوباره تلاش کنید."
+
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    token.code_hash = make_password(code)
+    token.expires_at = now + timezone.timedelta(minutes=10)
+    token.used_at = None
+    token.attempt_count = 0
+    token.resend_count += 1
+    token.locked_until = None
+    token.save(update_fields=[
+        "code_hash", "expires_at", "used_at", "attempt_count", "resend_count",
+        "locked_until", "window_started_at",
+    ])
+
+    send_mail(
+        "کد تأیید ایمیل فین‌ای",
+        f"کد تأیید ایمیل شما: {code}\n\nاین کد ۱۰ دقیقه اعتبار دارد. اگر این درخواست از طرف شما نبوده، آن را نادیده بگیرید.",
+        None,
+        [user.email],
+        fail_silently=False,
+    )
+    return True, None
 
 
 @never_cache
@@ -46,12 +92,79 @@ def register_view(request):
             phone_number=data.get("phone_number") or None,
             password=data["password"],
             full_name=data.get("full_name", ""),
+            is_active=not bool(data.get("email")),
         )
+        if user.email:
+            try:
+                _issue_email_code(user)
+            except Exception:
+                user.delete()
+                return render(request, "accounts/register.html", {
+                    "form": form,
+                    "email_error": "ارسال کد تأیید انجام نشد. تنظیمات ایمیل را بررسی و دوباره تلاش کنید.",
+                })
+            request.session["pending_email_verification_user_id"] = str(user.pk)
+            return redirect("accounts:verify_email")
         login(request, user, backend="apps.accounts.backends.EmailOrPhoneBackend")
         request.session.cycle_key()  # rotate session id on privilege change
         return redirect("core:dashboard")
 
     return render(request, "accounts/register.html", {"form": form})
+
+
+@never_cache
+@require_http_methods(["GET", "POST"])
+@ratelimit(key="ip", rate="20/h", method="POST", block=True)
+def verify_email_view(request):
+    user_id = request.session.get("pending_email_verification_user_id")
+    user = User.objects.filter(pk=user_id, email__isnull=False).first()
+    if not user:
+        return redirect("accounts:register")
+
+    token = user.email_tokens.filter(used_at__isnull=True).order_by("-created_at").first()
+    error = None
+    form = EmailVerificationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        now = timezone.now()
+        if token and token.locked_until and token.locked_until > now:
+            error = "به‌دلیل تلاش‌های ناموفق، تأیید برای ۳ دقیقه متوقف شده است."
+        elif not token or now >= token.expires_at:
+            error = "کد منقضی شده است. کد جدید درخواست کنید."
+        elif not check_password(form.cleaned_data["code"], token.code_hash):
+            token.attempt_count += 1
+            if token.attempt_count >= 5:
+                token.locked_until = now + timezone.timedelta(minutes=3)
+            token.save(update_fields=["attempt_count", "locked_until"])
+            error = "کد واردشده نادرست است."
+        else:
+            token.used_at = now
+            token.save(update_fields=["used_at"])
+            user.email_verified = True
+            user.is_active = True
+            user.save(update_fields=["email_verified", "is_active"])
+            request.session.pop("pending_email_verification_user_id", None)
+            login(request, user, backend="apps.accounts.backends.EmailOrPhoneBackend")
+            return redirect("core:dashboard")
+
+    return render(request, "accounts/verify_email.html", {"form": form, "email": user.email, "error": error})
+
+
+@require_http_methods(["POST"])
+@ratelimit(key="ip", rate="20/h", method="POST", block=True)
+def resend_email_view(request):
+    user_id = request.session.get("pending_email_verification_user_id")
+    user = User.objects.filter(pk=user_id, email__isnull=False).first()
+    if not user:
+        return redirect("accounts:register")
+    token = user.email_tokens.filter(used_at__isnull=True).order_by("-created_at").first()
+    try:
+        success, error = _issue_email_code(user, token=token)
+    except Exception:
+        success, error = False, "ارسال کد انجام نشد. تنظیمات ایمیل را بررسی کنید."
+    return render(request, "accounts/verify_email.html", {
+        "form": EmailVerificationForm(), "email": user.email,
+        "message": "کد جدید ارسال شد." if success else None, "error": error,
+    })
 
 
 @never_cache

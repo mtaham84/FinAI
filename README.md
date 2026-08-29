@@ -45,9 +45,9 @@ python manage.py test apps
 - **Auth** (`apps/accounts`): email-or-phone registration/login/logout,
   Argon2 password hashing, rate-limited login/register, generic error
   messages (no account enumeration), session rotation on login,
-  password-reset token flow, and OTP/email-verification *architecture*
-  (no SMS/email provider is wired up — see `PhoneOTP`,
-  `EmailVerificationToken` in `apps/accounts/models.py`).
+  password-reset token flow, and email OTP verification with hashed codes,
+  five-attempt limits, and three-minute lockouts. Phone OTP remains an
+  architecture placeholder (`PhoneOTP` in `apps/accounts/models.py`).
 - **Financial data model** (`apps/finance/models.py`): FinancialAccount,
   Transaction, Income, Asset, Liability, Installment, Goal,
   RiskProfile, Portfolio, Holding.

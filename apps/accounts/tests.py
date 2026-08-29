@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
+from django.contrib.auth.hashers import make_password
+from django.core import mail
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 User = get_user_model()
 
 
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class RegistrationTests(TestCase):
     def test_register_with_email_creates_user_with_hashed_password(self):
         client = Client()
@@ -19,9 +22,12 @@ class RegistrationTests(TestCase):
             },
         )
         self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:verify_email"), response.url)
         user = User.objects.get(email="new@example.com")
         self.assertNotEqual(user.password, "Str0ng-Passw0rd!")
         self.assertTrue(user.password.startswith("argon2$"))
+        self.assertFalse(user.is_active)
+        self.assertFalse(user.email_verified)
 
     def test_register_requires_email_or_phone(self):
         client = Client()
@@ -49,6 +55,36 @@ class RegistrationTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(email="mismatch@example.com").exists())
+
+    def test_email_registration_sends_otp_and_verification_activates_user(self):
+        client = Client()
+        response = client.post(
+            reverse("accounts:register"),
+            {"email": "verify@example.com", "password": "Str0ng-Passw0rd!", "password_confirm": "Str0ng-Passw0rd!"},
+        )
+        self.assertRedirects(response, reverse("accounts:verify_email"))
+        self.assertEqual(len(mail.outbox), 1)
+        user = User.objects.get(email="verify@example.com")
+        token = user.email_tokens.get()
+        token.code_hash = make_password("123456")
+        token.save(update_fields=["code_hash"])
+        response = client.post(reverse("accounts:verify_email"), {"code": "123456"})
+        self.assertRedirects(response, reverse("core:dashboard"))
+        user.refresh_from_db()
+        self.assertTrue(user.is_active)
+        self.assertTrue(user.email_verified)
+
+    def test_email_verification_locks_after_five_wrong_codes(self):
+        client = Client()
+        client.post(
+            reverse("accounts:register"),
+            {"email": "locked@example.com", "password": "Str0ng-Passw0rd!", "password_confirm": "Str0ng-Passw0rd!"},
+        )
+        for _ in range(5):
+            response = client.post(reverse("accounts:verify_email"), {"code": "000000"})
+        response = client.post(reverse("accounts:verify_email"), {"code": "000000"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "۳ دقیقه")
 
     def test_register_rejects_weak_password(self):
         client = Client()

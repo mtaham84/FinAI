@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}تأیید ایمیل — {{ BRAND_NAME }}{% endblock %}
+{% block content %}
+<div class="auth-shell">
+  <div class="card auth-card" style="text-align:center;">
+    <div class="navbar__brand-mark" style="margin:0 auto 18px;">✓</div>
+    <h2>تأیید ایمیل</h2>
+    <p>کد ۶ رقمی ارسال‌شده به ایمیل زیر را وارد کنید:</p>
+    <strong style="color:var(--color-oxford);direction:ltr;display:block;margin-bottom:20px;">{{ email }}</strong>
+
+    {% if message %}<div class="form-message">{{ message }}</div>{% endif %}
+    {% if error %}<div class="form-message" style="border-color:var(--color-danger);color:var(--color-danger);">{{ error }}</div>{% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="id_code">کد تأیید</label>
+        {{ form.code }}
+        {% if form.code.errors %}<div class="form-error">{{ form.code.errors.0 }}</div>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">تأیید ایمیل</button>
+    </form>
+    <form method="post" action="{% url 'accounts:resend_email' %}" style="margin-top:12px;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline btn-block">ارسال دوباره کد</button>
+    </form>
+    <p style="margin-top:18px;font-size:.85rem;">کد تا ۱۰ دقیقه معتبر است و حداکثر ۵ تلاش مجاز دارید.</p>
+  </div>
+</div>
+{% endblock %}

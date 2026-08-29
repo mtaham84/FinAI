@@ -81,3 +81,13 @@ class PasswordResetConfirmForm(forms.Form):
         if p1:
             password_validation.validate_password(p1)
         return cleaned
+
+
+class EmailVerificationForm(forms.Form):
+    code = forms.CharField(max_length=6, min_length=6, strip=True)
+
+    def clean_code(self):
+        code = self.cleaned_data["code"]
+        if not code.isascii() or not code.isdigit():
+            raise ValidationError("کد باید شامل ۶ رقم باشد.")
+        return code
