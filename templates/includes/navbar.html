@@ -5,6 +5,9 @@
       <span class="navbar__brand-mark">F</span> {{ BRAND_NAME }}
     </a>
     <button class="navbar__toggle" type="button" aria-label="باز کردن منو" aria-expanded="false">☰</button>
+    <button class="theme-toggle" type="button" aria-label="تغییر حالت نمایش" title="تغییر حالت نمایش">
+      <span class="theme-toggle__sun">☀</span><span class="theme-toggle__moon">☾</span>
+    </button>
 
     {% if user.is_authenticated %}
       <nav class="navbar__links">

@@ -30,10 +30,21 @@
   {% endblock %}
   {% block extra_scripts %}{% endblock %}
   <script>
+    (() => {
+      const savedTheme = localStorage.getItem('finai-theme');
+      if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
+    })();
+
     document.querySelector('.navbar__toggle')?.addEventListener('click', function () {
       const header = this.closest('.navbar');
       const open = header.classList.toggle('is-open');
       this.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    document.querySelector('.theme-toggle')?.addEventListener('click', function () {
+      const dark = document.documentElement.dataset.theme === 'dark';
+      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+      localStorage.setItem('finai-theme', dark ? 'light' : 'dark');
     });
   </script>
 </body>
