@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ BRAND_NAME }} — {{ BRAND_TAGLINE }}{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=3">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=4">
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -30,10 +30,14 @@
   {% endblock %}
   {% block extra_scripts %}{% endblock %}
   <script>
-    (() => {
-      const savedTheme = localStorage.getItem('finai-theme');
-      if (savedTheme === 'dark') document.documentElement.dataset.theme = 'dark';
-    })();
+    const themeToggle = document.querySelector('.theme-toggle');
+    const applyTheme = (theme) => {
+      const isDark = theme === 'dark';
+      document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+      themeToggle?.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+      if (themeToggle) themeToggle.querySelector('.theme-toggle__label').textContent = isDark ? 'حالت روز' : 'حالت شب';
+    };
+    try { applyTheme(localStorage.getItem('finai-theme') || 'light'); } catch (error) { applyTheme('light'); }
 
     document.querySelector('.navbar__toggle')?.addEventListener('click', function () {
       const header = this.closest('.navbar');
@@ -41,10 +45,11 @@
       this.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
 
-    document.querySelector('.theme-toggle')?.addEventListener('click', function () {
+    themeToggle?.addEventListener('click', function () {
       const dark = document.documentElement.dataset.theme === 'dark';
-      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
-      localStorage.setItem('finai-theme', dark ? 'light' : 'dark');
+      const nextTheme = dark ? 'light' : 'dark';
+      applyTheme(nextTheme);
+      try { localStorage.setItem('finai-theme', nextTheme); } catch (error) { /* storage may be disabled */ }
     });
   </script>
 </body>
