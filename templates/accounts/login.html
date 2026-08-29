@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-shell">
+  <div class="card auth-card">
+    <h2>خوش برگشتید</h2>
+    <p>برای دیدن تصویر مالی خود وارد شوید.</p>
+
+    {% if error %}<div class="form-message" style="border-color:var(--color-danger);color:var(--color-danger);">{{ error }}</div>{% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="id_identifier">ایمیل یا شماره تلفن</label>
+        {{ form.identifier }}
+        {% if form.identifier.errors %}<div class="form-error">{{ form.identifier.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="id_password">رمز عبور</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="form-error">{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">ورود</button>
+    </form>
+
+    <p style="margin-top:18px;font-size:0.9rem;">
+      <a href="{% url 'accounts:password_reset_request' %}">رمز عبور را فراموش کرده‌اید؟</a>
+    </p>
+    <p style="font-size:0.9rem;">
+      تازه‌وارد هستید؟ <a href="{% url 'accounts:register' %}">ساخت حساب</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

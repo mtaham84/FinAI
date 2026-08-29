@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <div class="container">
+    <span class="pill pill-gold">مدیر مالی شخصی با هوش مصنوعی</span>
+    <h1>پول شما، یک هوش مصنوعی.</h1>
+    <p class="lead">
+      پولتان را بهتر بشناسید، هزینه‌ها را کنترل کنید، برای اهداف‌تان برنامه‌ریزی کنید
+      و تصمیم‌های مالی هوشمندانه‌تری بگیرید؛ همه در یکجا.
+    </p>
+    <div class="hero__actions">
+      <a href="{% url 'accounts:register' %}" class="btn btn-gold">شروع رایگان</a>
+      <a href="{% url 'core:coming_soon' section='معرفی محصول' %}" class="btn btn-outline">ببینید چگونه کار می‌کند</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--color-bg-soft);">
+  <div class="container">
+    <div class="section-title">
+      <h2>فین‌ای چگونه کار می‌کند؟</h2>
+      <p>از داده‌های واقعی شما شروع می‌کنیم و آن‌ها را به تصویری روشن برای تصمیم‌گیری تبدیل می‌کنیم.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card feature-card"><span class="pill pill-gold">۱</span><h3>جمع‌آوری امن</h3><p>اطلاعات مالی شما در یک ساختار منظم و با رعایت مالکیت داده ثبت می‌شود.</p></div>
+      <div class="card feature-card"><span class="pill pill-gold">۲</span><h3>محاسبه دقیق</h3><p>دارایی، هزینه، بدهی و نقدینگی با منطق قطعی و قابل‌ردگیری محاسبه می‌شوند.</p></div>
+      <div class="card feature-card"><span class="pill pill-gold">۳</span><h3>بینش قابل‌فهم</h3><p>اطلاعات پیچیده به توضیح‌های ساده و کاربردی برای تصمیم‌های بهتر تبدیل می‌شود.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>زندگی مالی شما همه‌جا پراکنده است</h2>
+      <p>حساب‌های بانکی، کارت‌ها، طلا، رمزارز، سهام، اقساط و رسیدهای خرید، هرکدام در برنامه‌ای جدا هستند
+      و هیچ‌جا تصویر کاملی از وضعیت مالی شما نشان نمی‌دهد.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card feature-card">
+        <div class="icon">🏦</div>
+        <h3>حساب‌های پراکنده</h3>
+        <p>پول نقد، موجودی بانک و سرمایه‌گذاری‌ها در برنامه‌های جدا از هم قرار دارند.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon">📉</div>
+        <h3>نبود تصویر واقعی از دارایی</h3>
+        <p>بیشتر افراد بدون جمع‌زدن اطلاعات پنج برنامه مختلف نمی‌دانند واقعاً چقدر دارایی دارند.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon">🤔</div>
+        <h3>تصمیم‌گیری بر اساس حدس</h3>
+        <p>خریدهای بزرگ و سرمایه‌گذاری‌ها بدون شناخت دقیق منابع در دسترس انجام می‌شوند.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--color-bg-soft);">
+  <div class="container">
+    <div class="section-title">
+      <h2>فین‌ای همه‌چیز را یکجا جمع می‌کند</h2>
+      <p>یک نقشه مالی، یک داشبورد و یک هوش مصنوعی که تصویر کامل مالی شما را می‌فهمد
+      و هیچ عددی را بدون پشتوانه ارائه نمی‌کند.</p>
+    </div>
+    <div class="grid grid-4">
+      <div class="card feature-card">
+        <div class="icon">💳</div>
+        <h3>هوشمندی هزینه‌ها</h3>
+        <p>دقیقاً ببینید پولتان در هر دسته، ماه‌به‌ماه کجا خرج می‌شود.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon">❤️‍🩹</div>
+        <h3>سلامت مالی</h3>
+        <p>دارایی خالص، نرخ پس‌انداز و نقدینگی؛ محاسبه‌شده، نه حدس‌زده.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon">🎯</div>
+        <h3>برنامه‌ریزی اهداف</h3>
+        <p>هدف و مهلت تعیین کنید تا فین‌ای فاصله مالی موردنیاز را دقیق محاسبه کند.</p>
+      </div>
+      <div class="card feature-card">
+        <div class="icon">📈</div>
+        <h3>هوشمندی سرمایه‌گذاری</h3>
+        <p>نمایی یکپارچه از طلا، رمزارز و سهام، همراه با تخصیص دارایی و حدود ریسک.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title">
+      <h2>نمایی زنده از داشبورد شما</h2>
+      <p>دارایی خالص، تخصیص دارایی و جریان نقدی، همیشه به‌روز.</p>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div style="background:var(--color-bg-soft);padding:28px;">
+        <div class="grid grid-4">
+          <div class="card"><div class="card-label">دارایی خالص</div><div class="card-value">580,000,000 <small>تومان</small></div></div>
+          <div class="card"><div class="card-label">پول نقد</div><div class="card-value">280,000,000 <small>تومان</small></div></div>
+          <div class="card"><div class="card-label">سرمایه‌گذاری‌ها</div><div class="card-value">220,000,000 <small>تومان</small></div></div>
+          <div class="card"><div class="card-label">بدهی</div><div class="card-value">80,000,000 <small>تومان</small></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--color-bg-soft);">
+  <div class="container">
+    <div class="section-title">
+      <h2>هوشمندی سرمایه‌گذاری بر پایه اعداد واقعی شما</h2>
+      <p>طلا، نقره، رمزارز و سهام در یک نمای تخصیص دارایی، همراه با پروفایل ریسک دقیق
+      که مستقل از هر آزمون شخصیتی، گزینه‌های مناسب شما را مشخص می‌کند.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="security-band">
+      <h2>امنیت و حریم خصوصی، از ابتدا</h2>
+      <p>رمزهای عبور به‌صورت هش‌شده نگهداری می‌شوند و هرگز به شکل متن ساده ذخیره نمی‌شوند. ما هرگز رمز پویا، CVV2
+      یا رمز کارت بانکی شما را درخواست نمی‌کنیم. همه اعداد مالی با منطق دقیق سمت سرور محاسبه می‌شوند، نه با حدس هوش مصنوعی.</p>
+      <div class="grid grid-3" style="margin-top:20px;">
+        <div><h3>🔒 نشست‌های رمزنگاری‌شده</h3><p>کوکی‌های امن، محافظت CSRF و تغییر نشست هنگام ورود.</p></div>
+        <div><h3>🧮 اعداد دقیق و قابل‌اتکا</h3><p>موجودی‌ها و محاسبات همیشه از پایگاه داده می‌آیند، نه مدل زبانی.</p></div>
+        <div><h3>🚫 بدون اطلاعات محرمانه اضافی</h3><p>ما رمز بانکی، CVV2 یا رمز کارت شما را درخواست نمی‌کنیم.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--color-bg-soft);">
+  <div class="container">
+    <div class="section-title">
+      <h2>مسیر پیش‌روی فین‌ای</h2>
+      <p>امروز: تصویری شفاف و قابل‌اعتماد از امور مالی شما. در آینده: یک دستیار مالی هوشمند که هزینه‌ها را توضیح می‌دهد،
+      اهداف را ارزیابی می‌کند و فقط با تأیید صریح شما، راهکارهای سرمایه‌گذاری را بررسی و پیشنهاد می‌دهد؛
+      همیشه دقیق و هرگز بدون اجازه شما مستقل از پولتان عمل نمی‌کند.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="text-align:center;">
+    <h2>از امروز پولتان را بهتر بشناسید</h2>
+    <p class="lead" style="margin:0 auto 24px;">شروع کاملاً رایگان است و فعلاً نیازی به اتصال حساب بانکی ندارید.</p>
+    <a href="{% url 'accounts:register' %}" class="btn btn-gold">ساخت حساب رایگان</a>
+  </div>
+</section>
+
+{% endblock %}

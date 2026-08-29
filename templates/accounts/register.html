@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-shell">
+  <div class="card auth-card">
+    <h2>حساب خود را بسازید</h2>
+    <p>با ایمیل یا شماره تلفن ثبت‌نام کنید.</p>
+
+    {% if form.non_field_errors %}
+      <div class="form-message" style="border-color:var(--color-danger);color:var(--color-danger);">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="id_full_name">نام و نام خانوادگی</label>
+        {{ form.full_name }}
+      </div>
+      <div class="form-field">
+        <label for="id_email">ایمیل</label>
+        {{ form.email }}
+        {% if form.email.errors %}<div class="form-error">{{ form.email.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="id_phone_number">شماره تلفن</label>
+        {{ form.phone_number }}
+        {% if form.phone_number.errors %}<div class="form-error">{{ form.phone_number.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="id_password">رمز عبور</label>
+        {{ form.password }}
+        {% if form.password.errors %}<div class="form-error">{{ form.password.errors.0 }}</div>{% endif %}
+      </div>
+      <div class="form-field">
+        <label for="id_password_confirm">تکرار رمز عبور</label>
+        {{ form.password_confirm }}
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">ساخت حساب</button>
+    </form>
+
+    <p style="margin-top:18px;font-size:0.9rem;">
+      حساب دارید؟ <a href="{% url 'accounts:login' %}">وارد شوید</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

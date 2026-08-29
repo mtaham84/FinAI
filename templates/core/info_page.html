@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} — {{ BRAND_NAME }}{% endblock %}
+{% block content %}
+<section class="section info-page">
+  <div class="container">
+    <div class="section-title">
+      <span class="pill pill-gold">فین‌ای</span>
+      <h1>{{ title }}</h1>
+      <p class="lead">{{ intro }}</p>
+    </div>
+    <div class="grid {% if cards|length > 4 %}grid-3{% else %}grid-3{% endif %}">
+      {% for heading, text in cards %}
+        <div class="card feature-card">
+          <h3>{{ heading }}</h3>
+          <p>{{ text }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

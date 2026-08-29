@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="padding:32px 20px;">
+  <div class="section-heading">
+    <h2>هزینه‌ها</h2>
+    <span class="pill pill-muted">۳۰ روز گذشته</span>
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="card-label">مجموع این ماه</div>
+      <div class="card-value">{{ total_this_month|floatformat:0 }} <small>تومان</small></div>
+    </div>
+    <div class="card">
+      <div class="card-label">تغییر نسبت به ماه قبل</div>
+      <div class="card-value">
+        {% if mom_change_pct is not None %}
+          {{ mom_change_pct }}<small>%</small>
+          {% if mom_change_pct > 0 %}<span class="pill pill-danger">افزایش</span>{% elif mom_change_pct < 0 %}<span class="pill pill-success">کاهش</span>{% endif %}
+        {% else %}
+          <small>هنوز اطلاعات کافی وجود ندارد</small>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">بزرگ‌ترین دسته</div>
+      <div class="card-value" style="font-size:1.2rem;">
+        {% if largest_category.0 %}{{ largest_category.0|title }}{% else %}—{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:28px;">
+    <h3>بر اساس دسته‌بندی</h3>
+    {% if breakdown %}
+      <table class="data-table">
+        <thead><tr><th>دسته‌بندی</th><th>مبلغ</th></tr></thead>
+        <tbody>
+        {% for category, amount in breakdown.items %}
+          <tr><td>{{ category|title }}</td><td>{{ amount|floatformat:0 }} تومان</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">🧾</div>
+        <p>هنوز هزینه‌ای ثبت نشده است.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="card" style="margin-bottom:28px;">
+    <h3>روند هزینه در هفت روز گذشته</h3>
+    <div class="trend-bars" aria-label="روند هزینه روزانه">
+      {% for item in trend %}
+        <div class="trend-bar-item">
+          <div class="trend-bar" style="height:{{ item.height }}%;" title="{{ item.amount|floatformat:0 }} تومان"></div>
+          <small>{{ item.label }}</small>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>تراکنش‌های اخیر</h3>
+    {% if recent_transactions %}
+      <table class="data-table">
+        <thead><tr><th>تاریخ</th><th>دسته‌بندی</th><th>شرح</th><th>مبلغ</th></tr></thead>
+        <tbody>
+        {% for tx in recent_transactions %}
+          <tr>
+            <td>{{ tx.occurred_at|date:"M j" }}</td>
+            <td>{{ tx.get_category_display }}</td>
+            <td>{{ tx.description|default:tx.merchant }}</td>
+            <td>{{ tx.amount|floatformat:0 }} تومان</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">🧾</div>
+        <p>هنوز تراکنشی ثبت نشده است.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

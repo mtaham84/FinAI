@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container" style="padding:32px 20px;">
+  <div class="section-heading">
+    <h2>شخصیت</h2>
+  </div>
+
+  <div class="card" style="margin-bottom:28px; background:var(--color-bg-soft);">
+    <p style="margin:0;">
+      <strong>توجه:</strong> ارزیابی‌های شخصیتی زیر (مانند MBTI) فقط برای شناخت بیشتر هستند
+      و <em>موتور تصمیم‌گیری مالی نیستند</em>. حدود واقعی سرمایه‌گذاری شما از پروفایل ریسک مالی
+      که در ادامه آمده است تعیین می‌شود.
+    </p>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="section-heading"><h3>شناخت شخصیت</h3></div>
+      {% if latest_results %}
+        {% for result in latest_results %}
+          <div style="margin-bottom:12px;">
+            <span class="pill pill-gold">{{ result.result_label }}</span>
+            <span class="dash-meta">{{ result.assessment.title }} — {{ result.created_at|date:"M j, Y" }}</span>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <div class="icon">🧭</div>
+          <p>هنوز ارزیابی‌ای انجام نشده است.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="section-heading"><h3>پروفایل ریسک مالی</h3></div>
+      {% if risk_profile %}
+        <table class="data-table">
+          <tr><td>سطح ریسک</td><td>{{ risk_profile.get_risk_level_display }}</td></tr>
+          <tr><td>افق سرمایه‌گذاری</td><td>{{ risk_profile.get_investment_horizon_display }}</td></tr>
+          <tr><td>ترجیح نقدینگی</td><td>{{ risk_profile.get_liquidity_preference_display }}</td></tr>
+          <tr><td>حداکثر تخصیص رمزارز</td><td>{{ risk_profile.max_crypto_allocation_pct }}٪</td></tr>
+          <tr><td>ذخیره اضطراری</td><td>{{ risk_profile.emergency_reserve_months }} ماه</td></tr>
+        </table>
+      {% else %}
+        <div class="empty-state">
+          <div class="icon">🛡️</div>
+          <p>هنوز پروفایل ریسک مالی تنظیم نشده است.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>ارزیابی‌های موجود</h3>
+    {% if assessments %}
+      <div class="grid grid-3">
+        {% for assessment in assessments %}
+          <div class="card feature-card">
+            <h3>{{ assessment.title }}</h3>
+            <p>{{ assessment.description }}</p>
+            <span class="pill pill-muted">{{ assessment.get_assessment_type_display }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">📋</div>
+        <p>هنوز ارزیابی‌ای تنظیم نشده است.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

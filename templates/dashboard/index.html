@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+
+  <div class="dash-header">
+    <div class="dash-greeting">
+      {% if now.hour < 12 %}صبح بخیر{% elif now.hour < 18 %}وقت بخیر{% else %}عصر بخیر{% endif %}،
+      {{ user.full_name|default:user.display_identifier }} 👋
+    </div>
+    <div class="dash-meta">{{ now|date:"l, F j, Y — H:i" }}</div>
+  </div>
+
+  {% if quote %}
+  <div class="quote-banner">
+    <p>“{{ quote.text }}”{% if quote.author %} — {{ quote.author }}{% endif %}</p>
+  </div>
+  {% endif %}
+
+  <div class="grid grid-4" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="card-label">مجموع دارایی خالص</div>
+      <div class="card-value">{{ summary.net_worth|floatformat:0 }} <small>تومان</small></div>
+    </div>
+    <div class="card">
+      <div class="card-label">پول نقد</div>
+      <div class="card-value">{{ summary.total_cash|floatformat:0 }} <small>تومان</small></div>
+    </div>
+    <div class="card">
+      <div class="card-label">سرمایه‌گذاری‌ها</div>
+      <div class="card-value">{{ summary.total_investments|floatformat:0 }} <small>تومان</small></div>
+    </div>
+    <div class="card">
+      <div class="card-label">بدهی</div>
+      <div class="card-value">{{ summary.total_debt|floatformat:0 }} <small>تومان</small></div>
+    </div>
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="card-label">درآمد ماهانه</div>
+      <div class="card-value">{{ summary.monthly_income|floatformat:0 }} <small>تومان</small></div>
+    </div>
+    <div class="card">
+      <div class="card-label">هزینه‌های ماهانه</div>
+      <div class="card-value">{{ summary.monthly_expenses|floatformat:0 }} <small>تومان</small></div>
+    </div>
+    <div class="card">
+      <div class="card-label">نرخ پس‌انداز</div>
+      <div class="card-value">{{ summary.savings_rate_pct }}<small>%</small></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:28px;">
+    <div class="section-heading">
+      <h3>تخصیص دارایی</h3>
+      <span class="pill pill-muted">داده آزمایشی</span>
+    </div>
+    {% if summary.allocation %}
+      <div class="allocation-bar">
+        {% for slice in summary.allocation %}
+          <div style="width:{{ slice.pct }}%;background:
+            {% if slice.asset_class == 'cash' %}var(--color-yale)
+            {% elif slice.asset_class == 'gold' %}var(--color-gold)
+            {% elif slice.asset_class == 'silver' %}#b8c2cc
+            {% elif slice.asset_class == 'crypto' %}var(--color-saffron)
+            {% elif slice.asset_class == 'stock' %}var(--color-oxford)
+            {% else %}var(--color-yale){% endif %};"></div>
+        {% endfor %}
+      </div>
+      <div class="allocation-legend">
+        {% for slice in summary.allocation %}
+          <span><span class="dot" style="background:
+            {% if slice.asset_class == 'cash' %}var(--color-yale)
+            {% elif slice.asset_class == 'gold' %}var(--color-gold)
+            {% elif slice.asset_class == 'silver' %}#b8c2cc
+            {% elif slice.asset_class == 'crypto' %}var(--color-saffron)
+            {% elif slice.asset_class == 'stock' %}var(--color-oxford)
+            {% else %}var(--color-yale){% endif %};"></span>
+            {{ slice.get_asset_class_display|default:slice.asset_class|title }} — {{ slice.pct }}%</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="icon">📊</div>
+        <p>هنوز دارایی‌ای ثبت نشده است.</p>
+        <a href="{% url 'core:coming_soon' section='اتصال حساب' %}" class="btn btn-outline">اتصال حساب آزمایشی</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="section-heading"><h3>طلا و نقره</h3></div>
+      <div class="grid grid-2">
+        <div>
+          <div class="card-label">طلا</div>
+          <div class="card-value" style="font-size:1.2rem;">{{ summary.total_gold|floatformat:0 }} <small>تومان</small></div>
+        </div>
+        <div>
+          <div class="card-label">نقره</div>
+          <div class="card-value" style="font-size:1.2rem;">{{ summary.total_silver|floatformat:0 }} <small>تومان</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-heading"><h3>دارایی‌های بانکی / شتاب</h3></div>
+      <div class="empty-state" style="padding:16px 0;">
+        <p>موجودی‌های آزمایشی زیر مجموع پول نقد شما را نشان می‌دهند.</p>
+        <span class="pill pill-muted">اتصال واقعی به بانک: به‌زودی</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="section-heading"><h3>رمزارز</h3></div>
+      <div class="card-value" style="font-size:1.2rem;">{{ summary.total_crypto|floatformat:0 }} <small>تومان</small></div>
+      <p style="margin-top:8px;">جزئیات BTC، ETH و USDT پس از اتصال کیف‌پول‌ها نمایش داده می‌شود.</p>
+      <a href="{% url 'core:coming_soon' section='کیف‌پول‌های رمزارز' %}" class="btn btn-outline">اتصال کیف‌پول</a>
+    </div>
+    <div class="card">
+      <div class="section-heading"><h3>سهام</h3></div>
+      <div class="card-value" style="font-size:1.2rem;">{{ summary.total_stocks|floatformat:0 }} <small>تومان</small></div>
+      <p style="margin-top:8px;">جزئیات سبد پس از اتصال حساب کارگزاری نمایش داده می‌شود.</p>
+      <a href="{% url 'core:coming_soon' section='حساب‌های کارگزاری' %}" class="btn btn-outline">اتصال کارگزاری</a>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-bottom:28px;">
+    <div class="card">
+      <div class="section-heading"><h3>دارایی‌های بانکی</h3><span class="pill pill-muted">آزمایشی</span></div>
+      {% for account in bank_accounts %}
+        <div class="section-heading" style="margin-bottom:8px;">
+          <span>{{ account.name }}</span><strong>{{ account.current_balance|floatformat:0 }} تومان</strong>
+        </div>
+      {% empty %}
+        <div class="empty-state" style="padding:16px 0;"><p>هنوز حساب بانکی ثبت نشده است.</p></div>
+      {% endfor %}
+      <p style="margin:14px 0 0;font-size:.85rem;">اتصال واقعی به بانک‌ها در نسخه آینده و فقط از مسیرهای رسمی انجام می‌شود.</p>
+    </div>
+    <div class="card">
+      <div class="section-heading"><h3>سرمایه قابل سرمایه‌گذاری</h3></div>
+      <div class="card-value">{{ investable_capital|floatformat:0 }} <small>تومان</small></div>
+      <p>این عدد پس از درنظرگرفتن ذخیره اضطراری، اهداف نزدیک و بدهی‌ها محاسبه شده است.</p>
+      <span class="pill pill-gold">محاسبه قطعی</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:40px;">
+    <div class="section-heading"><h3>اهداف مالی</h3><span class="pill pill-muted">به‌زودی</span></div>
+    {% for goal in goals %}
+      <div class="section-heading" style="margin-bottom:8px;">
+        <span>{{ goal.title }}</span><strong>{{ goal.current_allocation|floatformat:0 }} از {{ goal.target_amount|floatformat:0 }} تومان</strong>
+      </div>
+    {% empty %}
+      <div class="empty-state" style="padding:16px 0;"><p>هنوز هدف مالی ثبت نشده است.</p></div>
+    {% endfor %}
+  </div>
+
+  <div class="grid grid-3" style="margin-bottom:40px;">
+    <a href="{% url 'expenses:index' %}" class="card feature-card">
+      <div class="icon">💳</div>
+      <h3>هزینه‌ها</h3>
+      <p>هزینه‌های خود را بر اساس دسته‌بندی ببینید.</p>
+    </a>
+    <a href="{% url 'core:coming_soon' section='اهداف مالی' %}" class="card feature-card">
+      <div class="icon">🎯</div>
+      <h3>اهداف <span class="badge-coming-soon">به‌زودی</span></h3>
+      <p>برای هدف مالی خود برنامه‌ریزی و پیشرفت آن را پیگیری کنید.</p>
+    </a>
+    <a href="{% url 'personality:index' %}" class="card feature-card">
+      <div class="icon">🧭</div>
+      <h3>شخصیت</h3>
+      <p>شناخت شخصیت و پروفایل ریسک مالی شما.</p>
+    </a>
+  </div>
+
+</div>
+{% endblock %}

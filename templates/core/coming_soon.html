@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <div class="empty-state" style="max-width:480px;margin:60px auto;">
+    <div class="icon">🚧</div>
+    <h2>{{ section }}</h2>
+  <p>این بخش از {{ BRAND_NAME }} به‌زودی آماده می‌شود. آن را با دقت می‌سازیم تا از همان روز اول قابل‌اعتماد باشد.</p>
+    <a href="{% if user.is_authenticated %}{% url 'core:dashboard' %}{% else %}{% url 'core:landing' %}{% endif %}" class="btn btn-primary">
+      بازگشت به {% if user.is_authenticated %}داشبورد{% else %}خانه{% endif %}
+    </a>
+  </div>
+</div>
+{% endblock %}

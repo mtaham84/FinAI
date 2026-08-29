@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ BRAND_NAME }} — {{ BRAND_TAGLINE }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}?v=3">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  {% include "includes/navbar.html" %}
+  <main>
+    {% if messages %}
+      <div class="container" style="padding-top:16px;">
+        {% for message in messages %}
+          <div class="form-message">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+  {% block footer %}
+  <footer class="footer">
+    <div class="container" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <span>© {% now "Y" %} {{ BRAND_NAME }}. پول شما، قابل‌فهم.</span>
+      <span>این مطالب توصیه سرمایه‌گذاری نیست و بازدهی تضمین‌شده‌ای وجود ندارد.</span>
+    </div>
+  </footer>
+  {% endblock %}
+  {% block extra_scripts %}{% endblock %}
+  <script>
+    document.querySelector('.navbar__toggle')?.addEventListener('click', function () {
+      const header = this.closest('.navbar');
+      const open = header.classList.toggle('is-open');
+      this.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  </script>
+</body>
+</html>

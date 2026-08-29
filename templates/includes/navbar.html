@@ -1,0 +1,40 @@
+{% load static %}
+<header class="navbar">
+  <div class="container navbar__inner">
+    <a href="{% url 'core:landing' %}" class="navbar__brand">
+      <span class="navbar__brand-mark">F</span> {{ BRAND_NAME }}
+    </a>
+    <button class="navbar__toggle" type="button" aria-label="باز کردن منو" aria-expanded="false">☰</button>
+
+    {% if user.is_authenticated %}
+      <nav class="navbar__links">
+        <a href="{% url 'core:dashboard' %}">داشبورد</a>
+        <a href="{% url 'core:coming_soon' section='دارایی‌های من' %}">دارایی‌های من</a>
+        <a href="{% url 'expenses:index' %}">هزینه‌ها</a>
+        <a href="{% url 'core:coming_soon' section='سرمایه‌گذاری‌ها' %}">سرمایه‌گذاری‌ها</a>
+        <a href="{% url 'core:coming_soon' section='اهداف' %}">اهداف</a>
+        <a href="{% url 'core:coming_soon' section='سلامت مالی' %}">سلامت مالی</a>
+        <a href="{% url 'personality:index' %}">شخصیت</a>
+        <a href="{% url 'core:coming_soon' section='گزارش‌ها' %}">گزارش‌ها</a>
+      </nav>
+      <div class="navbar__actions">
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline">خروج</button>
+        </form>
+      </div>
+    {% else %}
+      <nav class="navbar__links">
+        <a href="{% url 'core:landing' %}">خانه</a>
+        <a href="{% url 'core:about' %}">درباره ما</a>
+        <a href="{% url 'core:services' %}">خدمات</a>
+        <a href="{% url 'core:support' %}">پشتیبانی</a>
+        <a href="{% url 'core:contact' %}">تماس با ما</a>
+      </nav>
+      <div class="navbar__actions">
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline">ورود</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-gold">ثبت‌نام</a>
+      </div>
+    {% endif %}
+  </div>
+</header>
