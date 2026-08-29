@@ -36,10 +36,9 @@ class RegistrationForm(forms.Form):
             raise ValidationError("ایمیل یا شماره تلفن خود را وارد کنید.")
 
         if email and User.objects.filter(email__iexact=email).exists():
-            # Generic message -- avoid confirming which channel is already taken
-            raise ValidationError("ثبت‌نام با اطلاعات واردشده انجام نشد.")
+            self.add_error("email", "این ایمیل قبلاً ثبت شده است.")
         if phone and User.objects.filter(phone_number=phone).exists():
-            raise ValidationError("ثبت‌نام با اطلاعات واردشده انجام نشد.")
+            self.add_error("phone_number", "این شماره تلفن قبلاً ثبت شده است.")
 
         password = cleaned.get("password")
         password_confirm = cleaned.get("password_confirm")
